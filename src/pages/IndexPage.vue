@@ -36,22 +36,41 @@
       </q-card-section>
     </q-card>
   </div>
+  <div class="row">
+    <q-card-section>
+      <q-btn @click="fetchTopItems"
+             label="Fetch Top Artists" />
+    </q-card-section>
+    <q-card-section v-if="topArtists !== null">
+      <q-list bordered
+              separator>
+        <q-item v-for="(artist, index) in topArtists.items"
+                :key="index">
+          <q-item-section>{{ artist.name }} - popularity {{ artist.popularity }}</q-item-section>
+        </q-item>
+      </q-list>
+    </q-card-section>
+  </div>
 
 </template>
 
 <script setup
         lang="ts">
 import { onMounted, ref } from 'vue'
-import { useAuthStore, useCounterStore } from 'stores/example-store'
+import { useAuthStore, useCounterStore, useSpotifyStore } from 'stores/example-store'
 import { storeToRefs } from 'pinia'
 import { api } from 'boot/axios'
+import TopItems = MyTypes.TopItems
+import UserProfile = MyTypes.UserProfile
 
 const store = useCounterStore()
 const authStore = useAuthStore()
+const spotifyStore = useSpotifyStore()
 
 const { counter, doubleCount } = storeToRefs(store)
-
 const { increment, decrement } = store
+
+const { topArtists } = storeToRefs(spotifyStore)
 
 const email = ref('')
 
@@ -86,7 +105,7 @@ async function redirectToAuthCodeFlow(clientId: string) {
   params.append('client_id', clientId)
   params.append('response_type', 'code')
   params.append('redirect_uri', 'http://localhost:9000')
-  params.append('scope', 'user-read-private user-read-email')
+  params.append('scope', 'user-read-private user-read-email user-top-read')
   params.append('code_challenge_method', 'S256')
   params.append('code_challenge', challenge)
 
@@ -113,13 +132,26 @@ async function getAccessToken(clientId: string, code: string): Promise<string> {
 }
 
 async function fetchProfile(token: string): Promise<UserProfile> {
-  const result = await api.get('https://api.spotify.com/v1/me',
+  const result = await api.get('/v1/me',
     {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
   return await result.data
+}
+
+async function fetchTopItems() {
+  const result = await api.get('/v1/me/top/artists ',
+    {
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+      },
+    },
+  )
+  const topItems: TopItems = result.data
+  console.log(topItems)
+  spotifyStore.storeArtists(topItems)
 }
 
 function generateCodeVerifier(length: number) {
@@ -140,30 +172,4 @@ async function generateCodeChallenge(codeVerifier: string) {
     .replace(/\//g, '_')
     .replace(/=+$/, '')
 }
-
-interface UserProfile {
-  country: string;
-  display_name: string;
-  email: string;
-  explicit_content: {
-    filter_enabled: boolean,
-    filter_locked: boolean
-  },
-  external_urls: { spotify: string; };
-  followers: { href: string; total: number; };
-  href: string;
-  id: string;
-  images: Image[];
-  product: string;
-  type: string;
-  uri: string;
-}
-
-interface Image {
-  url: string;
-  height: number;
-  width: number;
-}
-
-
 </script>

@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import TopItems = MyTypes.TopItems
 
 export const useCounterStore = defineStore('counter', {
   state: () => ({
@@ -33,4 +34,17 @@ export const useAuthStore = defineStore('auth', {
     },
   },
 })
+
+export const useSpotifyStore = defineStore('spotify', {
+  state: () => ({
+    topArtists: null as unknown as TopItems,
+  }),
+  getters: {},
+  actions: {
+    storeArtists(artists: TopItems) {
+      this.topArtists = artists
+    },
+  },
+})
+
 
