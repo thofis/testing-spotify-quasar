@@ -16,7 +16,8 @@
     </q-card>
   </div>
   <div class="row">
-    <q-card v-if="!authStore.authenticated">
+    <q-card v-if="!authStore.authenticated"
+            class="full-width flex flex-center">
       <q-card-section>
         Login with Spotify
       </q-card-section>
@@ -43,6 +44,7 @@
 import { onMounted, ref } from 'vue'
 import { useAuthStore, useCounterStore } from 'stores/example-store'
 import { storeToRefs } from 'pinia'
+import { api } from 'boot/axios'
 
 const store = useCounterStore()
 const authStore = useAuthStore()
@@ -101,21 +103,23 @@ async function getAccessToken(clientId: string, code: string): Promise<string> {
   params.append('redirect_uri', 'http://localhost:9000')
   params.append('code_verifier', verifier!)
 
-  const result = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: params,
-  })
-
-  const { access_token } = await result.json()
+  const result = await api.post('https://accounts.spotify.com/api/token',
+    params,
+    {
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    })
+  const { access_token } = await result.data
   return access_token
 }
 
 async function fetchProfile(token: string): Promise<UserProfile> {
-  const result = await fetch('https://api.spotify.com/v1/me', {
-    method: 'GET', headers: { Authorization: `Bearer ${token}` },
-  })
-  return await result.json()
+  const result = await api.get('https://api.spotify.com/v1/me',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+  return await result.data
 }
 
 function generateCodeVerifier(length: number) {
