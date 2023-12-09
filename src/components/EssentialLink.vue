@@ -19,7 +19,8 @@
   </q-item>
 </template>
 
-<script setup lang="ts">
+<script setup
+        lang="ts">
 export interface EssentialLinkProps {
   title: string;
   caption?: string;

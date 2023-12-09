@@ -21,13 +21,14 @@ export const useCounterStore = defineStore('counter', {
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: '',
-    clientId: import.meta.env.VITE_CLIENT_ID
+    clientId: import.meta.env.VITE_CLIENT_ID,
   }),
   getters: {
     authenticated: (state) => state.token !== undefined && state.token != '',
   },
   actions: {
     storeToken(token: string) {
+      console.log('storing token: ' + token)
       this.token = token
     },
   },

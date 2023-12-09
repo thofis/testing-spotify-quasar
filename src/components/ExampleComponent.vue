@@ -2,7 +2,9 @@
   <div>
     <p>{{ title }}</p>
     <ul>
-      <li v-for="todo in todos" :key="todo.id" @click="increment">
+      <li v-for="todo in todos"
+          :key="todo.id"
+          @click="increment">
         {{ todo.id }} - {{ todo.content }}
       </li>
     </ul>
@@ -12,7 +14,8 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup
+        lang="ts">
 import { computed, ref } from 'vue'
 import { Meta, Todo } from './models'
 

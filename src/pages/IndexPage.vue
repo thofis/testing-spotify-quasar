@@ -1,35 +1,45 @@
 <template>
-  <q-card>
-    <q-card-section>
-      Counter: {{ counter }}
-    </q-card-section>
-    <q-card-section>
-      DoubleCount: {{ doubleCount }}
-    </q-card-section>
-    <q-card-section>
-      <q-btn @click="increment" icon="add" />
-      <q-btn @click="decrement" icon="remove" />
-    </q-card-section>
-  </q-card>
-  <q-card v-if="!authStore.authenticated">
-    <q-card-section>
-      Login with Spotify
-    </q-card-section>
-    <q-card-section>
-      <q-btn @click="redirectToAuthCodeFlow(clientId)" icon="login" round />
-    </q-card-section>
-  </q-card>
-  <q-card v-if="authStore.authenticated">
-    <q-card-section>
-      {{ authStore.token }}
-    </q-card-section>
-    <q-card-section>
-      {{ email }}
-    </q-card-section>
-  </q-card>
+  <div class="row">
+    <q-card class="full-width flex flex-center">
+      <q-card-section>
+        Counter: {{ counter }}
+      </q-card-section>
+      <q-card-section>
+        DoubleCount: {{ doubleCount }}
+      </q-card-section>
+      <q-card-section>
+        <q-btn @click="increment"
+               icon="add" />
+        <q-btn @click="decrement"
+               icon="remove" />
+      </q-card-section>
+    </q-card>
+  </div>
+  <div class="row">
+    <q-card v-if="!authStore.authenticated">
+      <q-card-section>
+        Login with Spotify
+      </q-card-section>
+      <q-card-section>
+        <q-btn @click="redirectToAuthCodeFlow(clientId)"
+               icon="login"
+               round />
+      </q-card-section>
+    </q-card>
+    <q-card v-if="authStore.authenticated">
+      <q-card-section>
+        {{ authStore.token }}
+      </q-card-section>
+      <q-card-section>
+        {{ email }}
+      </q-card-section>
+    </q-card>
+  </div>
+
 </template>
 
-<script setup lang="ts">
+<script setup
+        lang="ts">
 import { onMounted, ref } from 'vue'
 import { useAuthStore, useCounterStore } from 'stores/example-store'
 import { storeToRefs } from 'pinia'
@@ -94,7 +104,7 @@ async function getAccessToken(clientId: string, code: string): Promise<string> {
   const result = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: params
+    body: params,
   })
 
   const { access_token } = await result.json()
@@ -103,7 +113,7 @@ async function getAccessToken(clientId: string, code: string): Promise<string> {
 
 async function fetchProfile(token: string): Promise<UserProfile> {
   const result = await fetch('https://api.spotify.com/v1/me', {
-    method: 'GET', headers: { Authorization: `Bearer ${token}` }
+    method: 'GET', headers: { Authorization: `Bearer ${token}` },
   })
   return await result.json()
 }
